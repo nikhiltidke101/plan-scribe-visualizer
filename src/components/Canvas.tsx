@@ -69,7 +69,15 @@ export const Canvas = () => {
     }
     
     const handleMouseDown = (e: any) => {
+      // Only create new shapes if we're not in select mode or if no object is targeted
       if (activeTool === "line" || activeTool === "rectangle" || activeTool === "circle") {
+        // Check if we clicked on an existing object
+        const target = fabricCanvas.findTarget(e.e, false);
+        if (target && target.selectable !== false) {
+          // If we clicked on an existing selectable object, don't create a new shape
+          return;
+        }
+
         const pointer = fabricCanvas.getPointer(e.e);
         setStartPoint({ x: pointer.x, y: pointer.y });
         setIsDrawing(true);
@@ -80,6 +88,18 @@ export const Canvas = () => {
       if (!isDrawing || !startPoint) return;
 
       const pointer = fabricCanvas.getPointer(e.e);
+      
+      // Check if we moved enough to create a shape (avoid accidental tiny shapes)
+      const minDistance = 5;
+      const distance = Math.sqrt(
+        Math.pow(pointer.x - startPoint.x, 2) + Math.pow(pointer.y - startPoint.y, 2)
+      );
+      
+      if (distance < minDistance) {
+        setIsDrawing(false);
+        setStartPoint(null);
+        return;
+      }
       
       if (activeTool === "line") {
         const line = new Line([startPoint.x, startPoint.y, pointer.x, pointer.y], {
