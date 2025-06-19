@@ -1,6 +1,5 @@
-
 import { useEffect, useRef, useState } from "react";
-import { Canvas as FabricCanvas, Circle, Rect, Line, Path } from "fabric";
+import { Canvas as FabricCanvas, Circle, Rect, Line, Path, Point } from "fabric";
 import { Toolbar } from "./Toolbar";
 import { AnnotationPanel } from "./AnnotationPanel";
 import { toast } from "sonner";
@@ -57,7 +56,7 @@ export const Canvas = () => {
       zoom *= 0.999 ** delta;
       if (zoom > 20) zoom = 20;
       if (zoom < 0.01) zoom = 0.01;
-      canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+      canvas.zoomToPoint(new Point(opt.e.offsetX, opt.e.offsetY), zoom);
       opt.e.preventDefault();
       opt.e.stopPropagation();
     });
@@ -190,14 +189,14 @@ export const Canvas = () => {
     if (!fabricCanvas) return;
     const zoom = fabricCanvas.getZoom();
     const center = fabricCanvas.getCenter();
-    fabricCanvas.zoomToPoint({ x: center.left, y: center.top }, Math.min(zoom * 1.2, 3));
+    fabricCanvas.zoomToPoint(new Point(center.left, center.top), Math.min(zoom * 1.2, 3));
   };
 
   const handleZoomOut = () => {
     if (!fabricCanvas) return;
     const zoom = fabricCanvas.getZoom();
     const center = fabricCanvas.getCenter();
-    fabricCanvas.zoomToPoint({ x: center.left, y: center.top }, Math.max(zoom * 0.8, 0.3));
+    fabricCanvas.zoomToPoint(new Point(center.left, center.top), Math.max(zoom * 0.8, 0.3));
   };
 
   const handleResetZoom = () => {
