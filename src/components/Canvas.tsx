@@ -42,8 +42,12 @@ export const Canvas = () => {
       canvas.add(line);
     }
 
-    canvas.freeDrawingBrush.color = "#1f2937";
-    canvas.freeDrawingBrush.width = 2;
+    // Initialize freeDrawingBrush properly
+    canvas.isDrawingMode = false;
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = "#1f2937";
+      canvas.freeDrawingBrush.width = 2;
+    }
 
     setFabricCanvas(canvas);
     toast.success("Canvas ready! Start designing your building plan.");
@@ -57,6 +61,12 @@ export const Canvas = () => {
     if (!fabricCanvas) return;
 
     fabricCanvas.isDrawingMode = activeTool === "draw";
+    
+    // Ensure freeDrawingBrush exists before setting properties
+    if (activeTool === "draw" && fabricCanvas.freeDrawingBrush) {
+      fabricCanvas.freeDrawingBrush.color = "#1f2937";
+      fabricCanvas.freeDrawingBrush.width = 2;
+    }
     
     const handleMouseDown = (e: any) => {
       if (activeTool === "line" || activeTool === "rectangle" || activeTool === "circle") {

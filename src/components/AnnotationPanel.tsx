@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { Canvas as FabricCanvas } from "fabric";
+import { Canvas as FabricCanvas, Circle, Rect, Line, Path } from "fabric";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Ruler, Square, CircleDot } from "lucide-react";
@@ -30,28 +29,27 @@ export const AnnotationPanel = ({ canvas, showAnnotations }: AnnotationPanelProp
       objects.forEach((obj, index) => {
         let dimensions = "";
         let type = "";
-        let icon = Square;
 
         if (obj.type === "rect") {
-          const width = Math.round((obj.width || 0) * (obj.scaleX || 1));
-          const height = Math.round((obj.height || 0) * (obj.scaleY || 1));
+          const rect = obj as Rect;
+          const width = Math.round((rect.width || 0) * (rect.scaleX || 1));
+          const height = Math.round((rect.height || 0) * (rect.scaleY || 1));
           dimensions = `${width} × ${height} px`;
           type = "Rectangle";
-          icon = Square;
         } else if (obj.type === "circle") {
-          const radius = Math.round((obj.radius || 0) * (obj.scaleX || 1));
+          const circle = obj as Circle;
+          const radius = Math.round((circle.radius || 0) * (circle.scaleX || 1));
           dimensions = `R: ${radius} px`;
           type = "Circle";
-          icon = CircleDot;
         } else if (obj.type === "line") {
-          const x1 = obj.x1 || 0;
-          const y1 = obj.y1 || 0;
-          const x2 = obj.x2 || 0;
-          const y2 = obj.y2 || 0;
+          const line = obj as Line;
+          const x1 = line.x1 || 0;
+          const y1 = line.y1 || 0;
+          const x2 = line.x2 || 0;
+          const y2 = line.y2 || 0;
           const length = Math.round(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)));
           dimensions = `${length} px`;
           type = "Line";
-          icon = Ruler;
         } else if (obj.type === "path") {
           type = "Freehand";
           dimensions = "Custom shape";
