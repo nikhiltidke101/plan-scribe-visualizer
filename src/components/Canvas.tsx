@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Canvas as FabricCanvas, Circle, Rect, Line, Path } from "fabric";
 import { Toolbar } from "./Toolbar";
@@ -49,6 +50,18 @@ export const Canvas = () => {
       canvas.freeDrawingBrush.width = 2;
     }
 
+    // Enable mouse wheel zoom
+    canvas.on('mouse:wheel', (opt) => {
+      const delta = opt.e.deltaY;
+      let zoom = canvas.getZoom();
+      zoom *= 0.999 ** delta;
+      if (zoom > 20) zoom = 20;
+      if (zoom < 0.01) zoom = 0.01;
+      canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+      opt.e.preventDefault();
+      opt.e.stopPropagation();
+    });
+
     setFabricCanvas(canvas);
     toast.success("Canvas ready! Start designing your building plan.");
 
@@ -72,7 +85,7 @@ export const Canvas = () => {
       // Only create new shapes if we're not in select mode or if no object is targeted
       if (activeTool === "line" || activeTool === "rectangle" || activeTool === "circle") {
         // Check if we clicked on an existing object
-        const target = fabricCanvas.findTarget(e.e, false);
+        const target = fabricCanvas.findTarget(e.e);
         if (target && target.selectable !== false) {
           // If we clicked on an existing selectable object, don't create a new shape
           return;
@@ -176,13 +189,15 @@ export const Canvas = () => {
   const handleZoomIn = () => {
     if (!fabricCanvas) return;
     const zoom = fabricCanvas.getZoom();
-    fabricCanvas.setZoom(Math.min(zoom * 1.2, 3));
+    const center = fabricCanvas.getCenter();
+    fabricCanvas.zoomToPoint({ x: center.left, y: center.top }, Math.min(zoom * 1.2, 3));
   };
 
   const handleZoomOut = () => {
     if (!fabricCanvas) return;
     const zoom = fabricCanvas.getZoom();
-    fabricCanvas.setZoom(Math.max(zoom * 0.8, 0.3));
+    const center = fabricCanvas.getCenter();
+    fabricCanvas.zoomToPoint({ x: center.left, y: center.top }, Math.max(zoom * 0.8, 0.3));
   };
 
   const handleResetZoom = () => {
